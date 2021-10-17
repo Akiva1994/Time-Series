@@ -1,0 +1,52 @@
+---
+title: "312188881"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(graphics)
+library(forecast)
+```
+
+
+# Q_3
+
+```{r}
+mu_zero = 0
+v_zero = 0 
+
+s_q = 0.1
+s_z = 0.5
+s_e = 1.1
+
+n = 100
+
+eps_q <- rnorm(n+2, sd = sqrt(s_q))
+eps_z <- rnorm(n+2, sd = sqrt(s_z))
+eps_e <- rnorm(n+2, sd = sqrt(s_e))
+
+
+
+y <- eps_e[seq(n)+1] + eps_z[seq(n)+1] + eps_q[seq(n)+1] + mu_zero + v_zero
+plot(y, type = "l")
+
+```
+# Q_4
+
+```{r}
+fit_trend <- window(y, start = 0)
+(fit <- StructTS(fit_trend, type = "trend"))
+plot(fit_trend)
+
+tsdiag(fit)
+
+(fit <- StructTS(log10(UKgas), type = "BSM"))
+
+plot(cbind(fitted(fit), resids=resid(fit)), main = "trend consumption")
+
+```
+
+

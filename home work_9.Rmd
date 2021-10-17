@@ -1,0 +1,74 @@
+---
+title: '312188881'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# q3
+
+
+b1 <- 0.52
+b2 <- 0.29
+sigma.true <- 4.1
+
+set.seed(9999);
+# simulating MA(2);
+ma2.sim <- arima.sim(list(ma = c(b1,b2)),n = 100, sd=sqrt(sigma.true))
+plot.ts(ma2.sim, ylim=c(-8,10),main="MA(2) process");
+
+
+# q4
+
+b1_4 = 0.5
+b2_4 = 0.3
+Q = 4
+
+# Generating the artificial data
+
+n <- 100
+eps <- rnorm(2*n, sd = 2)
+y <- rep(0,2*n)
+y[3]
+for(i in 3:(2*n)) y[i] <- eps[i] + b1_4*eps[i-1] + b2_4*eps[i-2]
+y <- y[-(1:n)]
+plot(y, type = "l")
+
+
+# in values
+a_zero = c(0,0,0)
+
+p <- matrix(c(1+b1_4**2+b2_4**2, b1_4, b2_4, b1_4,1,0,b2_4,0,1),3,3)
+p <- p*Q
+p
+
+z =  c(1,0,0)
+Tr = matrix((c(0,b1_4,b2_4,0,0,0,0,1,0)),3,3) 
+R = c(1,1,0)
+rqr = R*Q*R
+rqr
+
+log.lik <- 0
+
+
+for(i in seq(n)){
+  # Prediction
+  a.present <- Tr %*% a_zero
+  P.present <- Tr %*% p %*% t(Tr) + rqr
+  mu.present <- a.present[1]
+  v.present <- y[i] - mu.present
+  F.present <- P.present[1,1]
+  a.past <- a.present + P.present[1,]*v.present/F.present
+  # Updating
+  P.past <- P.present - outer(P.present[1,],P.present[1,])/F.present
+  log.lik <- log.lik - 0.5*(log(2*pi*F.present) + v.present^2/F.present)
+  }
+
+
+log.lik 
+
+
+```
